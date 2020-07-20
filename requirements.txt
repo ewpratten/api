@@ -1,3 +1,4 @@
 flask
 requests
 tvdsb-student-api>=1.6
+sentry-sdk[flask]==0.16.1
