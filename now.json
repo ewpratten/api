@@ -5,6 +5,10 @@
         {
             "src": "**/*.py",
             "use": "@now/python@canary"
+        },
+        {
+            "src": "apidocs/**",
+            "use": "@now/static"
         }
     ]
 }
