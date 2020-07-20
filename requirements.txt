@@ -1,2 +1,3 @@
 flask
 requests
+tvdsb-student-api>=1.6
