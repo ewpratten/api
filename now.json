@@ -1,0 +1,10 @@
+{
+    "version": 2,
+    "name": "api",
+    "builds": [
+        {
+            "src": "**/*.py",
+            "use": "@now/python@canary"
+        }
+    ]
+}
