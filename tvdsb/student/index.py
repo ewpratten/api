@@ -37,7 +37,7 @@ def auth():
     # Return the creds
     return jsonify({
         "success": True,
-        "token":b64encode(pickle.dumps(creds))
+        "token":b64encode(pickle.dumps(creds)).decode()
     })
     
 @app.route("/tvdsb/student/attendance", methods=["GET"])
@@ -48,7 +48,7 @@ def attendance():
 
     # Unpickle (and handle invalid token)
     try:
-        creds = pickle.loads(b64decode(token))
+        creds = pickle.loads(b64decode(token.encode()))
     except EOFError as e:
         return jsonify({
             "success": False,
@@ -77,7 +77,7 @@ def marks():
 
     # Unpickle (and handle invalid token)
     try:
-        creds = pickle.loads(b64decode(token))
+        creds = pickle.loads(b64decode(token.encode()))
     except EOFError as e:
         return jsonify({
             "success": False,
@@ -106,7 +106,7 @@ def payment():
 
     # Unpickle (and handle invalid token)
     try:
-        creds = pickle.loads(b64decode(token))
+        creds = pickle.loads(b64decode(token.encode()))
     except EOFError as e:
         return jsonify({
             "success": False,
@@ -135,7 +135,7 @@ def timetable():
 
     # Unpickle (and handle invalid token)
     try:
-        creds = pickle.loads(b64decode(token))
+        creds = pickle.loads(b64decode(token.encode()))
     except EOFError as e:
         return jsonify({
             "success": False,
