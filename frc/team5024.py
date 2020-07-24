@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
 ## App ##
 
-@route("/frc/5024/lib5k/version")
+@app.route("/frc/5024/lib5k/version")
 def lib5kVersion():
 
     # Read from the API
