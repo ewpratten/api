@@ -53,7 +53,7 @@
         },
         {
             "src": "/frc/5024/lib5k/version",
-            "dest": "/frc/team5024",
+            "dest": "/frc/team5024.py",
             "headers": {
                 "Access-Control-Allow-Origin": "*"
             }

@@ -268,3 +268,26 @@ paths:
               message:
                 type: string
                 example: "invalid login"
+  /frc/5024/lib5k/version:
+    get:
+      summary: "Get the latest Lib5K version info"
+      tags:
+        - Raider Robotics
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "Lib5K version information"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: true
+              version:
+                type: string
+              date:
+                type: string
+              changelog:
+                type: string
+        
