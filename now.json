@@ -12,11 +12,36 @@
         }
     ],
     "routes": [
-        { "src": "/tvdsb/student/auth", "dest": "/tvdsb/student" },
-        { "src": "/tvdsb/student/attendance", "dest": "/tvdsb/student" },
-        { "src": "/tvdsb/student/marks", "dest": "/tvdsb/student" },
-        { "src": "/tvdsb/student/payment", "dest": "/tvdsb/student" },
-        { "src": "/tvdsb/student/timetable", "dest": "/tvdsb/student" }
-
+        {
+            "src": "/tvdsb/student/auth",
+            "dest": "/tvdsb/student"
+        },
+        {
+            "src": "/tvdsb/student/attendance",
+            "dest": "/tvdsb/student"
+        },
+        {
+            "src": "/tvdsb/student/marks",
+            "dest": "/tvdsb/student"
+        },
+        {
+            "src": "/tvdsb/student/payment",
+            "dest": "/tvdsb/student"
+        },
+        {
+            "src": "/tvdsb/student/timetable",
+            "dest": "/tvdsb/student"
+        }
+    ],
+    "headers": [
+        {
+            "source": "**/**",
+            "headers": [
+                {
+                    "key": "Access-Control-Allow-Origin",
+                    "value": "*"
+                }
+            ]
+        }
     ]
 }
