@@ -11,7 +11,7 @@
             "use": "@now/static"
         },
         {
-            "src": "apidocs/swagger.yml",
+            "src": "apidocs/swagger.yaml",
             "use": "@now/static"
         }
     ],
