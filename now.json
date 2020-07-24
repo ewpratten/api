@@ -9,6 +9,10 @@
         {
             "src": "apidocs/**",
             "use": "@now/static"
+        },
+        {
+            "src": "apidocs/swagger.yml",
+            "use": "@now/static"
         }
     ],
     "routes": [

@@ -14,6 +14,8 @@ paths:
   /tvdsb/student/auth:
     post:
       summary: "Get a TVDSB API Token from a student user id and password"
+      tags:
+        - TVDSB Student
       consumes:
       - "multipart/form-data"
       produces:
@@ -41,6 +43,220 @@ paths:
               token:
                 type: string
                 example: XNlcm5hbWVxA1gLAAAAc
+        401:
+          description: "Invalid login"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+                example: "invalid login"
+  /tvdsb/student/attendance:
+    get:
+      summary: "Get a student's attengance records for the current year"
+      tags:
+        - TVDSB Student
+      produces:
+      - "application/json"
+      parameters:
+      - name: "token"
+        in: "query"
+        description: "TVDSB Student API Token"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Student attendance information"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: true
+              records:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    code:
+                      type: string
+                    course_code:
+                      type: string
+                    date:
+                      type: string
+                    period:
+                      type: integer
+                    reason:
+                      type: string
+        401:
+          description: "Invalid login"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+                example: "invalid login"
+  /tvdsb/student/marks:
+    get:
+      summary: "Get a student's complete mark history"
+      tags:
+        - TVDSB Student
+      produces:
+      - "application/json"
+      parameters:
+      - name: "token"
+        in: "query"
+        description: "TVDSB Student API Token"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Student mark history"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: true
+              marks:
+                type: object
+                description: "This will contain a key for every year"
+                additionalProperties:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      comment:
+                        type: string
+                      course:
+                        type: string
+                      date:
+                        type: string
+                      mark:
+                        type: integer
+                      skills:
+                        type: object
+                        properties:
+                          homework:
+                            type: string
+                          independence:
+                            type: string
+                          initiative:
+                            type: string
+                          organization: 
+                            type: string
+                          teamwork: 
+                            type: string
+        401:
+          description: "Invalid login"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+                example: "invalid login"
+  /tvdsb/student/timetable:
+    get:
+      summary: "Get a student's current and/or upcoming timetable (depends on time of year)"
+      tags:
+        - TVDSB Student
+      produces:
+      - "application/json"
+      parameters:
+      - name: "token"
+        in: "query"
+        description: "TVDSB Student API Token"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Student timetable information"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: true
+              timetable:
+                type: object
+                properties:
+                  student_info:
+                    type: object
+                    properties:
+                      grade:
+                        type: integer
+                      locker_number:
+                        type: integer
+                      ontario_education_number:
+                        type: integer
+                      student_number:
+                        type: integer
+                      name:
+                        type: array
+                        items:
+                          type: string
+                  course_semesters:
+                    type: array
+                    items:
+                      type: array
+                      items:
+                        type: object
+                        properties: 
+                          course_code:
+                            type: string
+                          period:
+                            type: integer
+                          start_time:
+                            type: integer
+                          end_time:
+                            type: integer
+        401:
+          description: "Invalid login"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+                example: "invalid login"
+  /tvdsb/student/payment:
+    get:
+      summary: "Get a student's payment info"
+      tags:
+        - TVDSB Student
+      produces:
+      - "application/json"
+      parameters:
+      - name: "token"
+        in: "query"
+        description: "TVDSB Student API Token"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Student payment information"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: true
+              info:
+                type: object
+                properties:
+                  pin:
+                    type: string
         401:
           description: "Invalid login"
           schema:
