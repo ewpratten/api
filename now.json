@@ -14,34 +14,38 @@
     "routes": [
         {
             "src": "/tvdsb/student/auth",
-            "dest": "/tvdsb/student"
+            "dest": "/tvdsb/student",
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            }
         },
         {
             "src": "/tvdsb/student/attendance",
-            "dest": "/tvdsb/student"
+            "dest": "/tvdsb/student",
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            }
         },
         {
             "src": "/tvdsb/student/marks",
-            "dest": "/tvdsb/student"
+            "dest": "/tvdsb/student",
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            }
         },
         {
             "src": "/tvdsb/student/payment",
-            "dest": "/tvdsb/student"
+            "dest": "/tvdsb/student",
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            }
         },
         {
             "src": "/tvdsb/student/timetable",
-            "dest": "/tvdsb/student"
-        }
-    ],
-    "headers": [
-        {
-            "source": "**/**",
-            "headers": [
-                {
-                    "key": "Access-Control-Allow-Origin",
-                    "value": "*"
-                }
-            ]
+            "dest": "/tvdsb/student",
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            }
         }
     ]
 }
