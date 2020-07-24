@@ -34,6 +34,15 @@ def auth():
     # Get auth object
     creds = tvdsb_student.LoginCreds(user, password)
 
+    # Make a dummy request to ensure creds are valid
+    try:
+        records = tvdsb_student.getAttendanceRecords(creds)
+    except tvdsb_student.auth.InvalidAuth as e:
+        return jsonify({
+            "success": False,
+            "message": "Invalid auth"
+        })
+
     # Return the creds
     return jsonify({
         "success": True,
