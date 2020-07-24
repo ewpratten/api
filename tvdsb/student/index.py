@@ -46,12 +46,12 @@ def auth():
         return jsonify({
             "success": False,
             "message": "No username set"
-        })
+        }),401
     if "password" not in request.form:
         return jsonify({
             "success": False,
             "message": "No password set"
-        })
+        }),401
 
     # Get user and password
     user = request.form["username"]
@@ -75,7 +75,7 @@ def auth():
         return jsonify({
             "success": False,
             "message": "Invalid auth"
-        })
+        }),401
 
     # Log a success
     track_event(
@@ -103,7 +103,7 @@ def attendance():
         return jsonify({
             "success": False,
             "message": "Invalid token format, or no token specified"
-        })
+        }),401
 
     # Get attendance
     try:
@@ -117,7 +117,7 @@ def attendance():
         return jsonify({
             "success": False,
             "message": "Invalid auth"
-        })
+        }),401
 
     # Log a success
     track_event(
@@ -144,7 +144,7 @@ def marks():
         return jsonify({
             "success": False,
             "message": "Invalid token format, or no token specified"
-        })
+        }),401
 
     # Get marks
     try:
@@ -158,7 +158,7 @@ def marks():
         return jsonify({
             "success": False,
             "message": "Invalid auth"
-        })
+        }),401
 
     # Log a success
     track_event(
@@ -185,7 +185,7 @@ def payment():
         return jsonify({
             "success": False,
             "message": "Invalid token format, or no token specified"
-        })
+        }),401
 
     # Get payment
     try:
@@ -199,7 +199,7 @@ def payment():
         return jsonify({
             "success": False,
             "message": "Invalid auth"
-        })
+        }),401
 
     # Log a success
     track_event(
@@ -226,7 +226,7 @@ def timetable():
         return jsonify({
             "success": False,
             "message": "Invalid token format, or no token specified"
-        })
+        }),401
 
     # Get timetable
     try:
@@ -240,7 +240,7 @@ def timetable():
         return jsonify({
             "success": False,
             "message": "Invalid auth"
-        })
+        }),401
 
     # Log a success
     track_event(

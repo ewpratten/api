@@ -1,0 +1,54 @@
+swagger: "2.0"
+info:
+  description: "The API powering many RetryLife projects, and some other projects made by friends"
+  version: "1.0.0"
+  title: "RetryLife API"
+  contact:
+    email: "ewpratten@retrylife.ca"
+host: "api.retrylife.ca"
+basePath: "/"
+schemes:
+- "https"
+- "http"
+paths:
+  /tvdsb/student/auth:
+    post:
+      summary: "Get a TVDSB API Token from a student user id and password"
+      consumes:
+      - "multipart/form-data"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "username"
+        in: "formData"
+        description: "Student user ID used to log into network computers"
+        required: true
+        type: "string"
+      - name: "password"
+        in: "formData"
+        description: "Student password used to log into network computers"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Auth token info"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: true
+              token:
+                type: string
+                example: XNlcm5hbWVxA1gLAAAAc
+        401:
+          description: "Invalid login"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+                example: "invalid login"
