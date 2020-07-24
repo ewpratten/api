@@ -8,6 +8,7 @@ sentry_sdk.init(
 )
 
 import pickle
+import random
 import tvdsb_student
 from base64 import b64encode, b64decode
 app = Flask(__name__)
@@ -33,6 +34,9 @@ def auth():
 
     # Get auth object
     creds = tvdsb_student.LoginCreds(user, password)
+
+    # Inject a random number into the object for some padding
+    creds.rand = random.randint(1000, 1000000)
 
     # Make a dummy request to ensure creds are valid
     try:
