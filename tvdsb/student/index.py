@@ -12,7 +12,7 @@ import tvdsb_student
 from base64 import b64encode, b64decode
 app = Flask(__name__)
 
-@app.route("/auth", methods=["POST"])
+@app.route("/tvdsb/student/auth", methods=["POST"])
 def auth():
     
     # Handle missing args
@@ -40,7 +40,7 @@ def auth():
         "token":b64encode(pickle.dumps(creds))
     })
     
-@app.route("/attendance", methods=["GET"])
+@app.route("/tvdsb/student/attendance", methods=["GET"])
 def attendance():
 
     # Get token
@@ -69,7 +69,7 @@ def attendance():
         "records":records
     })
 
-@app.route("/marks", methods=["GET"])
+@app.route("/tvdsb/student/marks", methods=["GET"])
 def marks():
 
     # Get token
@@ -98,7 +98,7 @@ def marks():
         "marks":records
     })
     
-@app.route("/payment", methods=["GET"])
+@app.route("/tvdsb/student/payment", methods=["GET"])
 def payment():
 
     # Get token
@@ -127,7 +127,7 @@ def payment():
         "info":records
     })
 
-@app.route("/timetable", methods=["GET"])
+@app.route("/tvdsb/student/timetable", methods=["GET"])
 def timetable():
 
     # Get token
