@@ -50,6 +50,13 @@
             "headers": {
                 "Access-Control-Allow-Origin": "*"
             }
+        },
+        {
+            "src": "/frc/5024/lib5k/version",
+            "dest": "/frc/team5024",
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            }
         }
     ]
 }
