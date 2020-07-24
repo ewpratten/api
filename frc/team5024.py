@@ -44,7 +44,7 @@ if __name__ == "__main__":
 def lib5kVersion():
 
     # Read from the API
-    data = requests.open("https://api.github.com/repos/frc5024/lib5k/releases/latest").json()
+    data = requests.get("https://api.github.com/repos/frc5024/lib5k/releases/latest").json()
 
     # Get the metadata
     tag_name = data["tag_name"]
