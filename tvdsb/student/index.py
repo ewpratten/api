@@ -1,4 +1,6 @@
 from flask import Flask, jsonify, request
+
+## Sentry Tracking ##
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 
@@ -7,8 +9,31 @@ sentry_sdk.init(
     integrations=[FlaskIntegration()]
 )
 
-import pickle
+## Google analytics ##
+import requests
 import random
+import hashlib
+GA_TRACKING_ID = "UA-74118570-5"
+
+def track_event(category, action, uid=hashlib.md5(str(random.random()).encode()).hexdigest(), label=None, value=0):
+    data = {
+        'v': '1',  # API Version.
+        'tid': GA_TRACKING_ID,  # Tracking ID / Property ID.
+        # Anonymous Client Identifier. Ideally, this should be a UUID that
+        # is associated with particular user, device, or browser instance.
+        'cid': '555',
+        't': 'event',  # Event hit type.
+        'ec': category,  # Event category.
+        'ea': action,  # Event action.
+        'el': label,  # Event label.
+        'ev': value,  # Event value, must be an integer
+        'ua': 'Opera/9.80 (Windows NT 6.0) Presto/2.12.388 Version/12.14'
+    }
+
+    response = requests.post(
+        'https://www.google-analytics.com/collect', data=data)
+
+import pickle
 import tvdsb_student
 from base64 import b64encode, b64decode
 app = Flask(__name__)
@@ -42,10 +67,22 @@ def auth():
     try:
         records = tvdsb_student.getAttendanceRecords(creds)
     except tvdsb_student.auth.InvalidAuth as e:
+        track_event(
+            "APICall.tvdsb_student",
+            "InvalidAuth",
+            uid=creds.username
+        )
         return jsonify({
             "success": False,
             "message": "Invalid auth"
         })
+
+    # Log a success
+    track_event(
+        "APICall.tvdsb_student",
+        "GotAuthToken",
+        uid=creds.username
+    )
 
     # Return the creds
     return jsonify({
@@ -72,10 +109,22 @@ def attendance():
     try:
         records = tvdsb_student.getAttendanceRecords(creds)
     except tvdsb_student.auth.InvalidAuth as e:
+        track_event(
+            "APICall.tvdsb_student",
+            "InvalidAuth",
+            uid=creds.username
+        )
         return jsonify({
             "success": False,
             "message": "Invalid auth"
         })
+
+    # Log a success
+    track_event(
+        "APICall.tvdsb_student",
+        "GotAttendance",
+        uid=creds.username
+    )
 
     return jsonify({
         "success": True,
@@ -101,10 +150,22 @@ def marks():
     try:
         records = tvdsb_student.getMarkHistory(creds)
     except tvdsb_student.auth.InvalidAuth as e:
+        track_event(
+            "APICall.tvdsb_student",
+            "InvalidAuth",
+            uid=creds.username
+        )
         return jsonify({
             "success": False,
             "message": "Invalid auth"
         })
+
+    # Log a success
+    track_event(
+        "APICall.tvdsb_student",
+        "GotMarkHistory",
+        uid=creds.username
+    )
 
     return jsonify({
         "success": True,
@@ -130,10 +191,22 @@ def payment():
     try:
         records = tvdsb_student.getPaymentInfo(creds)
     except tvdsb_student.auth.InvalidAuth as e:
+        track_event(
+            "APICall.tvdsb_student",
+            "InvalidAuth",
+            uid=creds.username
+        )
         return jsonify({
             "success": False,
             "message": "Invalid auth"
         })
+
+    # Log a success
+    track_event(
+        "APICall.tvdsb_student",
+        "GotPaymentInfo",
+        uid=creds.username
+    )
 
     return jsonify({
         "success": True,
@@ -159,10 +232,22 @@ def timetable():
     try:
         records = tvdsb_student.getTimetable(creds)
     except tvdsb_student.auth.InvalidAuth as e:
+        track_event(
+            "APICall.tvdsb_student",
+            "InvalidAuth",
+            uid=creds.username
+        )
         return jsonify({
             "success": False,
             "message": "Invalid auth"
         })
+
+    # Log a success
+    track_event(
+        "APICall.tvdsb_student",
+        "GotTimeTable",
+        uid=creds.username
+    )
 
     return jsonify({
         "success": True,
