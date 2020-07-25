@@ -393,6 +393,25 @@ def lib5kVersion():
         "changelog": changelog
     }), 200
 
+@app.route("/tracking/external/<path>")
+def trackExternal(path):
+
+    print(f"An external service made a tracking request with path: {path}")
+
+    # Track this request
+    trackAPICall(
+        f"/tracking/external/{path}",
+        uid= getBrowserFingerprint()
+    )
+
+    return flask.jsonify(
+        {
+            "success": True,
+            "message": "Logged event"
+        }
+    ), 200
+
+
 # endroutes
 
 # Create a little runner for starting Flask locally

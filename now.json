@@ -17,49 +17,14 @@
     ],
     "routes": [
         {
+            "src": "**/*",
+            "dest": "/router.py",
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            }
+        },
+        {
             "src": "/",
-            "dest": "/router.py",
-            "headers": {
-                "Access-Control-Allow-Origin": "*"
-            }
-        },
-        {
-            "src": "/tvdsb/student/auth",
-            "dest": "/router.py",
-            "headers": {
-                "Access-Control-Allow-Origin": "*"
-            }
-        },
-        {
-            "src": "/tvdsb/student/attendance",
-            "dest": "/router.py",
-            "headers": {
-                "Access-Control-Allow-Origin": "*"
-            }
-        },
-        {
-            "src": "/tvdsb/student/marks",
-            "dest": "/router.py",
-            "headers": {
-                "Access-Control-Allow-Origin": "*"
-            }
-        },
-        {
-            "src": "/tvdsb/student/payment",
-            "dest": "/router.py",
-            "headers": {
-                "Access-Control-Allow-Origin": "*"
-            }
-        },
-        {
-            "src": "/tvdsb/student/timetable",
-            "dest": "/router.py",
-            "headers": {
-                "Access-Control-Allow-Origin": "*"
-            }
-        },
-        {
-            "src": "/frc/5024/lib5k/version",
             "dest": "/router.py",
             "headers": {
                 "Access-Control-Allow-Origin": "*"
