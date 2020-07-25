@@ -33,6 +33,7 @@ def getBrowserFingerprint() -> str:
 
 # Load the GA tracking ID
 GA_TRACKING_ID = os.environ.get("GA_TRACKING_ID", "NO-GA-ID")
+print(f"Loaded GA token: {GA_TRACKING_ID}")
 
 # Google analytics namespace
 
