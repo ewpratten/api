@@ -36,40 +36,9 @@ def track_event(category, action, uid=hashlib.md5(str(random.random()).encode())
 
 app = Flask(__name__)
 
-@app.route("/", methods=["GET", "POST"])
-def index():
-    track_event(
-        "APICall",
-        "Index"
-    )
-    return jsonify({
-        "success": True,
-        "message":"welcome"
-    })
 
-@app.errorhandler(404)
-def error404(e):
-    track_event(
-        "Error",
-        "404"
-    )
-    return jsonify({
-        "success": False,
-        "message": "not found",
-        "error":str(e)
-    }), 404
 
-@app.errorhandler(500)
-def error500(e):
-    track_event(
-        "Error",
-        "500"
-    )
-    return jsonify({
-        "success": False,
-        "message":"an application error ocurred",
-        "error":str(e)
-    }), 500
+
 
 if __name__ == "__main__":
 
