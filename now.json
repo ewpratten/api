@@ -18,42 +18,42 @@
     "routes": [
         {
             "src": "/tvdsb/student/auth",
-            "dest": "/tvdsb/student",
+            "dest": "/router",
             "headers": {
                 "Access-Control-Allow-Origin": "*"
             }
         },
         {
             "src": "/tvdsb/student/attendance",
-            "dest": "/tvdsb/student",
+            "dest": "/router",
             "headers": {
                 "Access-Control-Allow-Origin": "*"
             }
         },
         {
             "src": "/tvdsb/student/marks",
-            "dest": "/tvdsb/student",
+            "dest": "/router",
             "headers": {
                 "Access-Control-Allow-Origin": "*"
             }
         },
         {
             "src": "/tvdsb/student/payment",
-            "dest": "/tvdsb/student",
+            "dest": "/router",
             "headers": {
                 "Access-Control-Allow-Origin": "*"
             }
         },
         {
             "src": "/tvdsb/student/timetable",
-            "dest": "/tvdsb/student",
+            "dest": "/router",
             "headers": {
                 "Access-Control-Allow-Origin": "*"
             }
         },
         {
             "src": "/frc/5024/lib5k/version",
-            "dest": "/frc/team5024.py",
+            "dest": "/router",
             "headers": {
                 "Access-Control-Allow-Origin": "*"
             }
