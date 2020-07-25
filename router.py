@@ -54,7 +54,8 @@ def ga_trackPath(url, uid=ga_generateRandomUID()):
         # is associated with particular user, device, or browser instance.
         'cid': uid,
         't': "pageview",
-        'dp': url
+        'dp': url,
+        'ua': 'Opera/9.80 (Windows NT 6.0) Presto/2.12.388 Version/12.14'
     }
 
     # Call the collection system
@@ -73,7 +74,7 @@ def ga_trackEvent(category, action, uid=ga_generateRandomUID()):
         'ea': action,  # Event action.
         'el': None,  # Event label.
         'ev': 0,  # Event value, must be an integer
-        # 'ua': 'Opera/9.80 (Windows NT 6.0) Presto/2.12.388 Version/12.14'
+        'ua': 'Opera/9.80 (Windows NT 6.0) Presto/2.12.388 Version/12.14'
     }
 
     # Call the collection system
