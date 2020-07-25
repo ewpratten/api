@@ -17,6 +17,13 @@
     ],
     "routes": [
         {
+            "src": "/",
+            "dest": "/router.py",
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            }
+        },
+        {
             "src": "/tvdsb/student/auth",
             "dest": "/router.py",
             "headers": {
