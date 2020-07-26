@@ -733,7 +733,7 @@ def getStatus():
     ))
 
     # Enable Vercel caching, since this endpoint takes so long to load
-    response.headers.set('Cache-Control', 's-maxage=600')
+    response.headers.set('Cache-Control', 's-maxage=1, stale-while-revalidate')
 
     # Return the status info
     return response
