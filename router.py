@@ -103,6 +103,13 @@ statuspage_endpoints = {
             "status_code":200
         }
     },
+    "Unofficial Student Portal": {
+        "description":"My TVDSB Student Portal frontend service",
+        "check_code": {
+            "urls": ["https://studentportal.retrylife.ca/"],
+            "status_code":200
+        }
+    },
     "cs.5024.ca": {
         "description":"The Raider Robotics software development team's primary web server",
         "check_code": {
