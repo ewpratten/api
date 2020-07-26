@@ -16,6 +16,7 @@ import pickle
 import flask
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
+import feedparser
 
 # Set up flask
 sentry_sdk.init(
@@ -395,6 +396,8 @@ def lib5kVersion():
         "changelog": changelog
     }), 200
 
+## External tracking
+
 @app.route("/tracking/external/<path>")
 def trackExternal(path):
 
@@ -413,6 +416,59 @@ def trackExternal(path):
         }
     ), 200
 
+## Deviantart
+
+@app.route("/deviantart/<user>/content")
+def deviantartContent(user):
+
+    # Get the browser fingerprint
+    fingerprint = getBrowserFingerprint()
+
+    # Track this request
+    trackAPICall(
+        f"/deviantart/{user}/content",
+        uid=fingerprint
+    )
+
+    # Call the RSS API
+    rss = feedparser.parse(f"https://backend.deviantart.com/rss.xml?type=deviation&q=by%3A{user}+sort%3Atime+meta%3Aall")
+
+    # Handle non-existant user
+    if rss["feed"]["subtitle"] == "Error generating RSS.":
+        return flask.jsonify(
+            {
+                "success": False,
+                "message": "User not found"
+            }
+        ), 404
+
+    # Parse the RSS
+    data = {
+        "metadata":{},
+        "content":[]
+    }
+
+    # Load in metadata
+    data["metadata"]["username"] = user
+    
+    # Load all entries
+    for entry in rss["entries"]:
+        data["content"].append(
+            {
+                "url": entry["link"],
+                "media": entry["media_content"],
+                "nsfw": entry["media_rating"]["content"] != "nonadult",
+                "title": entry["title"]
+            }
+        )
+
+    # Respond
+    return flask.jsonify(
+        {
+            "success": True,
+            "data":data
+        }
+    ), 200
 
 # endroutes
 
