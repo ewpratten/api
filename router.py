@@ -156,6 +156,16 @@ def index():
         "message":"welcome"
     })
 
+## Static files
+
+@app.route('/apidocs')
+def staticAPIDocsIndex():
+    return flask.send_from_directory('apidocs', "index.html")
+
+@app.route('/apidocs/<path:path>')
+def staticAPIDocs(path):
+    return flask.send_from_directory('apidocs', path)
+
 ## TVDSB
 
 @app.route("/tvdsb/student/auth", methods=["POST"])
