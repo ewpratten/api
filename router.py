@@ -25,6 +25,118 @@ sentry_sdk.init(
 )
 app = flask.Flask(__name__)
 
+# List of endpoints to check for the status page. As long as
+# one of the endpoints in a list is good, the status will be OK
+statuspage_endpoints = {
+    "retrylife.ca": {
+        "check_code": {
+            "urls": ["https://retrylife.ca", "http://retrylife.ca"],
+            "status_code":200
+        }
+    },
+    "RetryLife API": {
+        "check_code": {
+            "urls": ["https://api.retrylife.ca"],
+            "status_code":200
+        }
+    },
+    "RetryLife Beta API": {
+        "check_code": {
+            "urls": ["https://beta.api.retrylife.ca"],
+            "status_code":200
+        }
+    },
+    "RetryLife API Global Infrastructure": {
+        "check_json_equal": {
+            "url": "https://www.vercel-status.com/api/v2/status.json",
+            "key":"status.description",
+            "value": "All Systems Operational"
+        }
+    },
+    "RetryLife API Backend Logging": {
+        "check_json_equal": {
+            "url": "https://status.datadoghq.com/api/v2/status.json",
+            "key":"status.description",
+            "value": "All Systems Operational"
+        }
+    },
+    "RetryLife API Error Tracking": {
+        "check_json_equal": {
+            "url": "https://status.sentry.io/api/v2/status.json",
+            "key":"status.description",
+            "value": "All Systems Operational"
+        }
+    },
+    "RetryLife Services Backend": {
+        "check_code": {
+            "urls": ["https://admin.rtlroute.cc"],
+            "status_code":200
+        }
+    },
+    "RetryLife Services Backend": {
+        "check_code": {
+            "urls": ["https://admin.rtlroute.cc"],
+            "status_code":200
+        }
+    },
+    "RetryLife DNS Frontend": {
+        "check_code": {
+            "urls": ["http://s2.retrylife.ca/admin/"],
+            "status_code":200
+        }
+    },
+    "RetryLife DNS Backend": {
+        "check_json_equal": {
+            "url": "http://s2.retrylife.ca/admin/api.php",
+            "key": "FTLnotrunning",
+            "value": "false"
+        }
+    },
+    "remains.xyz": {
+        "check_code": {
+            "urls": ["https://remains.xyz"],
+            "status_code":200
+        }
+    },
+    "cs.5024.ca": {
+        "check_code": {
+            "urls": ["https://cs.5024.ca"],
+            "status_code":200
+        }
+    },
+    "frc5024.github.io":{
+        "check_code": {
+            "urls": ["https://frc5024.github.io"],
+            "status_code":200
+        }
+    },
+    "5024 Webdocs": {
+        "check_code": {
+            "urls": ["https://cs.5024.ca/webdocs", "https://frc5024.github.io/webdocs"],
+            "status_code":200
+        }
+    },
+    "Snapcode Backend": {
+        "check_code": {
+            "urls": ["https://app.snapchat.com/web/deeplink/snapcode?username=testuser&type=PNG"],
+            "status_code":200
+        }
+    },
+    "TheBlueAlliance Backend": {
+        "check_code": {
+            "urls": ["https://www.thebluealliance.com/api/v3/status"],
+            "status_code":401
+        }
+    },
+    "FRC Field Management Database": {
+        "check_json_equal": {
+            "url": "https://frc-api.firstinspires.org/v2.0/",
+            "key":"status",
+            "value": "normal"
+        }
+    },
+}
+
 ### Crash Tracking & Analytics ###
 
 # Fingerprinting
