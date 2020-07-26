@@ -480,6 +480,50 @@ def deviantartContent(user):
         }
     ), 200
 
+# Snapchat
+
+@app.route("/snapchat/<user>/snapcode.png")
+def getPNGSnapCode(user):
+
+    # Get the browser fingerprint
+    fingerprint = getBrowserFingerprint()
+
+    # Track this request
+    trackAPICall(
+        f"/snapchat/{user}/snapcode.png",
+        uid=fingerprint
+    )
+
+    # Make remote API call
+    image = requests.get(f"https://app.snapchat.com/web/deeplink/snapcode?username={user}&type=PNG&size=240", stream = True)
+    image.raw.decode_content = True
+
+    response = flask.make_response(image.raw.data)
+    response.headers.set('Content-Type', 'image/png')
+
+    return response
+
+@app.route("/snapchat/<user>/snapcode.svg")
+def getSVGSnapCode(user):
+
+    # Get the browser fingerprint
+    fingerprint = getBrowserFingerprint()
+
+    # Track this request
+    trackAPICall(
+        f"/snapchat/{user}/snapcode.svg",
+        uid=fingerprint
+    )
+
+    # Make remote API call
+    image = requests.get(f"https://app.snapchat.com/web/deeplink/snapcode?username={user}&type=SVG&size=240", stream = True)
+    image.raw.decode_content = True
+
+    response = flask.make_response(image.raw.data)
+    response.headers.set('Content-Type', 'image/svg')
+
+    return response
+
 # endroutes
 
 # Create a little runner for starting Flask locally
