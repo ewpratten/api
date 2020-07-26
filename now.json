@@ -29,6 +29,20 @@
             "headers": {
                 "Access-Control-Allow-Origin": "*"
             }
+        },
+        {
+            "src": "/apidocs/(?<file>[^/]+)",
+            "dest": "/apidocs/$file",
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            }
+        },
+        {
+            "src": "/apidocs/dist/(?<file>[^/]+)",
+            "dest": "/apidocs/dist/$file",
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            }
         }
     ]
 }
