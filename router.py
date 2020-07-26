@@ -103,6 +103,20 @@ statuspage_endpoints = {
             "status_code":200
         }
     },
+    "Unofficial Student Portal": {
+        "description":"My TVDSB Student Portal frontend service",
+        "check_code": {
+            "urls": ["https://studentportal.retrylife.ca/"],
+            "status_code":200
+        }
+    },
+    "RetryLife Maven": {
+        "description":"The RetryLife maven server",
+        "check_code": {
+            "urls": ["https://mvn.retrylife.ca/"],
+            "status_code":200
+        }
+    },
     "cs.5024.ca": {
         "description":"The Raider Robotics software development team's primary web server",
         "check_code": {
@@ -729,6 +743,92 @@ def getStatus():
         {
             "success": True,
             "services":output
+        }
+    ))
+
+    # Enable Vercel caching, since this endpoint takes so long to load
+    response.headers.set('Cache-Control', 's-maxage=1, stale-while-revalidate')
+
+    # Return the status info
+    return response
+
+# James' activity tracking stuff
+@app.route("/rsninja722/activity")
+def rsNinjaActivity():
+
+    # Get the browser fingerprint
+    fingerprint = getBrowserFingerprint()
+
+    # Track this request
+    trackAPICall(
+        f"/rsninja722/activity",
+        uid=fingerprint
+    )
+
+    # Storage for data
+    datapoints = []
+
+    # Get his lookup table
+    lut = requests.get("https://rsninja.dev/timeUse/definitions.csv").text
+
+    # Convert to KVP data
+    lut_kvp = {}
+    for entry in lut.split("\n")[1:]:
+        entry = entry.split(",")
+
+        # Ignore empty lines
+        if len(entry) < 2:
+            continue
+
+        # Set the kay and value
+        lut_kvp[entry[0]] = entry[1]
+
+    # Get his daily info
+    day_info_raw = requests.get("https://rsninja.dev/timeUse/timeUse.csv").text.split("\n")[1:]
+
+    # Iterate every day
+    for day_data in day_info_raw:
+        day_data = day_data.split(",")
+
+        # Get date info
+        year = day_data[0]
+        month = day_data[1]
+        day = day_data[2]
+
+        # Get only his day, not his comment at the end
+        day_data_points = day_data[3:][:48]
+
+        # Build the day's datapoint
+        output = {
+            "date":f"{year}/{month}/{day}",
+            "data":{
+
+            },
+            "comment":""
+        }
+
+        # Add his comment if it exists
+        if len(day_data) >= 52:
+            output["comment"] = day_data[51].strip()
+
+        # Accumulate time data
+        for point in day_data_points:
+            
+            # Add any new point
+            if lut_kvp[point] not in output["data"]:
+                output["data"][lut_kvp[point]] = 0.5
+            else:
+                output["data"][lut_kvp[point]] += 0.5
+
+        # Add day's datapoint to the list 
+        datapoints.append(output)
+
+
+    # Build a response
+    response = flask.make_response(flask.jsonify(
+        {
+            "success": True,
+            "daily_data":datapoints
         }
     ))
 

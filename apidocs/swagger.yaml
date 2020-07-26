@@ -407,3 +407,33 @@ paths:
                       type: string
                     service_info:
                       type: string
+  /rsninja722/activity:
+    get:
+      summary: "Get information about rsninja722's life"
+      produces:
+      - "application/json"
+      tags:
+        - Other
+      responses:
+        200:
+          description: "rsninja722's time tracking info"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: true
+              daily_data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    date:
+                      type: string
+                    comment:
+                      type: string
+                      description: "Recent datapoints now contain his comment about the day"
+                    data:
+                      type: object
+                      additionalProperties:
+                        type: number
