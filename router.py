@@ -722,15 +722,20 @@ def getStatus():
                     "ok":False,
                     "message": STATUS_FAIL
                 }
-        
-
-    # Return the status info
-    return flask.jsonify(
+    
+    # Build a response
+    response = flask.make_response(flask.jsonify(
         {
             "success": True,
             "services":output
         }
-    ), 200
+    ))
+
+    # Enable Vercel caching, since this endpoint takes so long to load
+    response.headers.set('Cache-Control', 's-maxage=600')
+
+    # Return the status info
+    return response
 
 # endroutes
 
