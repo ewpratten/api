@@ -110,6 +110,13 @@ statuspage_endpoints = {
             "status_code":200
         }
     },
+    "RetryLife Maven": {
+        "description":"The RetryLife maven server",
+        "check_code": {
+            "urls": ["https://mvn.retrylife.ca/"],
+            "status_code":200
+        }
+    },
     "cs.5024.ca": {
         "description":"The Raider Robotics software development team's primary web server",
         "check_code": {
