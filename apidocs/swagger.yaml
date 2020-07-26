@@ -5,7 +5,7 @@ info:
   title: "RetryLife API"
   contact:
     email: "ewpratten@retrylife.ca"
-host: "api.retrylife.ca"
+# host: "api.retrylife.ca"
 basePath: "/"
 schemes:
 - "https"
