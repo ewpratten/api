@@ -344,3 +344,39 @@ paths:
                           type: string
                         url:
                           type: string
+  /snapchat/{user}/snapcode.png:
+    get:
+      summary: "Get the snapcode for a Snapchat account as a PNG"
+      tags:
+        - Snapchat
+      produces:
+      - "image/png"
+      parameters:
+        - name: "user"
+          in: "path"
+          description: "Snapchat username"
+          required: true
+          type: string
+      responses:
+        200:
+          description: "User snapcode"
+          schema:
+            type: file
+  /snapchat/{user}/snapcode.svg:
+    get:
+      summary: "Get the snapcode for a Snapchat account as an SVG"
+      tags:
+        - Snapchat
+      produces:
+      - "image/svg"
+      parameters:
+        - name: "user"
+          in: "path"
+          description: "Snapchat username"
+          required: true
+          type: string
+      responses:
+        200:
+          description: "User snapcode"
+          schema:
+            type: file
