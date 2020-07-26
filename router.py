@@ -30,24 +30,28 @@ app.config['JSON_SORT_KEYS'] = False
 # one of the endpoints in a list is good, the status will be OK
 statuspage_endpoints = {
     "retrylife.ca": {
+        "description":"The retrylife.ca homepage",
         "check_code": {
             "urls": ["https://retrylife.ca", "http://retrylife.ca"],
             "status_code":200
         }
     },
     "RetryLife API": {
+        "description":"The RetryLife API's production deployment",
         "check_code": {
             "urls": ["https://api.retrylife.ca"],
             "status_code":200
         }
     },
-    "RetryLife Beta API": {
+    "RetryLife Development API": {
+        "description":"The RetryLife API's development deployment",
         "check_code": {
             "urls": ["https://beta.api.retrylife.ca"],
             "status_code":200
         }
     },
     "RetryLife API Global Infrastructure": {
+        "description":"The distributed backend infrastructure that hosts the RetryLife API",
         "check_json_equal": {
             "url": "https://www.vercel-status.com/api/v2/status.json",
             "key":"status.description",
@@ -55,13 +59,15 @@ statuspage_endpoints = {
         }
     },
     "RetryLife API Backend Logging": {
+        "description":"The error logging service that keeps track of RetryLife API errors and events",
         "check_json_equal": {
             "url": "https://status.datadoghq.com/api/v2/status.json",
             "key":"status.description",
             "value": "All Systems Operational"
         }
     },
-    "RetryLife API Error Tracking": {
+    "RetryLife API Crash Tracking": {
+        "description":"The crash tracker for the RetryLife API, and some of Evan's apps",
         "check_json_equal": {
             "url": "https://status.sentry.io/api/v2/status.json",
             "key":"status.description",
@@ -69,24 +75,21 @@ statuspage_endpoints = {
         }
     },
     "RetryLife Services Backend": {
-        "check_code": {
-            "urls": ["https://admin.rtlroute.cc"],
-            "status_code":200
-        }
-    },
-    "RetryLife Services Backend": {
+        "description":"The docker swarm master and main compute host powering the backend of most RetryLife services",
         "check_code": {
             "urls": ["https://admin.rtlroute.cc"],
             "status_code":200
         }
     },
     "RetryLife DNS Frontend": {
+        "description":"The admin panel for RetryLife DNS",
         "check_code": {
             "urls": ["http://s2.retrylife.ca/admin/"],
             "status_code":200
         }
     },
     "RetryLife DNS Backend": {
+        "description":"The RetryLife DNS server",
         "check_json_equal": {
             "url": "http://s2.retrylife.ca/admin/api.php",
             "key": "FTLnotrunning",
@@ -94,42 +97,49 @@ statuspage_endpoints = {
         }
     },
     "remains.xyz": {
+        "description":"The remains.xyz gameservers",
         "check_code": {
             "urls": ["https://remains.xyz"],
             "status_code":200
         }
     },
     "cs.5024.ca": {
+        "description":"The Raider Robotics software development team's primary web server",
         "check_code": {
             "urls": ["https://cs.5024.ca"],
             "status_code":200
         }
     },
     "frc5024.github.io":{
+        "description":"The Raider Robotics software development team's fallback web server",
         "check_code": {
             "urls": ["https://frc5024.github.io"],
             "status_code":200
         }
     },
     "5024 Webdocs": {
+        "description":"The Raider Robotics software development team's documentation website",
         "check_code": {
             "urls": ["https://cs.5024.ca/webdocs", "https://frc5024.github.io/webdocs"],
             "status_code":200
         }
     },
     "Snapcode Backend": {
+        "description":"The Snapchat deeplink server that handles snapcode generation",
         "check_code": {
             "urls": ["https://app.snapchat.com/web/deeplink/snapcode?username=testuser&type=PNG"],
             "status_code":200
         }
     },
     "TheBlueAlliance Backend": {
+        "description":"TheBlueAlliance's backend server",
         "check_code": {
             "urls": ["https://www.thebluealliance.com/api/v3/status"],
             "status_code":401
         }
     },
     "FRC Field Management Database": {
+        "description":"The primary API server for connecting to FRC game databases",
         "check_json_equal": {
             "url": "https://frc-api.firstinspires.org/v2.0/",
             "key":"status",
@@ -664,7 +674,8 @@ def getStatus():
         # Default to failure if no type
         output[endpoint] = {
             "ok":False,
-            "message": STATUS_FAIL
+            "message": STATUS_FAIL,
+            "service_info": statuspage_endpoints[endpoint]["description"]
         }
 
         # Handle check type
@@ -677,16 +688,12 @@ def getStatus():
             # Check every URL
             for url in urls:
                 if requests.get(url).status_code == code:
-                    output[endpoint] = {
-                        "ok":True,
-                        "message": STATUS_OK
-                    }
+                    output[endpoint]["ok"] = True
+                    output[endpoint]["message"] = STATUS_OK
                     break
             else:
-                output[endpoint] = {
-                    "ok":False,
-                    "message": STATUS_FAIL
-                }
+                output[endpoint]["ok"] = False
+                output[endpoint]["message"] = STATUS_FAIL
         elif "check_json_equal" in statuspage_endpoints[endpoint]:
 
             # Get data
@@ -701,10 +708,8 @@ def getStatus():
             try:
                 json = data.json()
             except:
-                output[endpoint] = {
-                    "ok":False,
-                    "message": STATUS_FAIL
-                }
+                output[endpoint]["ok"] = False
+                output[endpoint]["message"] = STATUS_FAIL
             
             # Recurse to get the value
             remote_data = json
@@ -713,15 +718,11 @@ def getStatus():
 
             # Check equality
             if str(remote_data) == str(value):
-                output[endpoint] = {
-                    "ok":True,
-                    "message": STATUS_OK
-                }
+                output[endpoint]["ok"] = True
+                output[endpoint]["message"] = STATUS_OK
             else:
-                output[endpoint] = {
-                    "ok":False,
-                    "message": STATUS_FAIL
-                }
+                output[endpoint]["ok"] = False
+                output[endpoint]["message"] = STATUS_FAIL
     
     # Build a response
     response = flask.make_response(flask.jsonify(

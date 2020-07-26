@@ -405,3 +405,5 @@ paths:
                       type: boolean
                     message:
                       type: string
+                    service_info:
+                      type: string
