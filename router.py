@@ -24,6 +24,7 @@ sentry_sdk.init(
     integrations=[FlaskIntegration()]
 )
 app = flask.Flask(__name__)
+app.config['JSON_SORT_KEYS'] = False
 
 # List of endpoints to check for the status page. As long as
 # one of the endpoints in a list is good, the status will be OK
@@ -635,6 +636,101 @@ def getSVGSnapCode(user):
     response.headers.set('Content-Type', 'image/svg')
 
     return response
+
+# Status
+
+@app.route("/status")
+def getStatus():
+
+    # Get the browser fingerprint
+    fingerprint = getBrowserFingerprint()
+
+    # Track this request
+    trackAPICall(
+        f"/status",
+        uid=fingerprint
+    )
+
+    # Possable messages
+    STATUS_OK = "Operational"
+    STATUS_FAIL = "Degraded or Down"
+
+    # Build an output dict
+    output = {}
+
+    # Interate through every endpoint to check
+    for endpoint in statuspage_endpoints:
+
+        # Default to failure if no type
+        output[endpoint] = {
+            "ok":False,
+            "message": STATUS_FAIL
+        }
+
+        # Handle check type
+        if "check_code" in statuspage_endpoints[endpoint]:
+
+            # Get check data
+            urls = statuspage_endpoints[endpoint]["check_code"]["urls"]
+            code = statuspage_endpoints[endpoint]["check_code"]["status_code"]
+
+            # Check every URL
+            for url in urls:
+                if requests.get(url).status_code == code:
+                    output[endpoint] = {
+                        "ok":True,
+                        "message": STATUS_OK
+                    }
+                    break
+            else:
+                output[endpoint] = {
+                    "ok":False,
+                    "message": STATUS_FAIL
+                }
+        elif "check_json_equal" in statuspage_endpoints[endpoint]:
+
+            # Get data
+            url = statuspage_endpoints[endpoint]["check_json_equal"]["url"]
+            key = statuspage_endpoints[endpoint]["check_json_equal"]["key"]
+            value = statuspage_endpoints[endpoint]["check_json_equal"]["value"]
+
+            # Get response from remote
+            data = requests.get(url)
+
+            # Try to get JSON data
+            try:
+                json = data.json()
+            except:
+                output[endpoint] = {
+                    "ok":False,
+                    "message": STATUS_FAIL
+                }
+            
+            # Recurse to get the value
+            remote_data = json
+            for subkey in key.split("."):
+                remote_data = remote_data[subkey]
+
+            # Check equality
+            if str(remote_data) == str(value):
+                output[endpoint] = {
+                    "ok":True,
+                    "message": STATUS_OK
+                }
+            else:
+                output[endpoint] = {
+                    "ok":False,
+                    "message": STATUS_FAIL
+                }
+        
+
+    # Return the status info
+    return flask.jsonify(
+        {
+            "success": True,
+            "services":output
+        }
+    ), 200
 
 # endroutes
 
