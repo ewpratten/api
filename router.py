@@ -24,6 +24,129 @@ sentry_sdk.init(
     integrations=[FlaskIntegration()]
 )
 app = flask.Flask(__name__)
+app.config['JSON_SORT_KEYS'] = False
+
+# List of endpoints to check for the status page. As long as
+# one of the endpoints in a list is good, the status will be OK
+statuspage_endpoints = {
+    "retrylife.ca": {
+        "description":"The retrylife.ca homepage",
+        "check_code": {
+            "urls": ["https://retrylife.ca", "http://retrylife.ca"],
+            "status_code":200
+        }
+    },
+    "RetryLife API": {
+        "description":"The RetryLife API's production deployment",
+        "check_code": {
+            "urls": ["https://api.retrylife.ca"],
+            "status_code":200
+        }
+    },
+    "RetryLife Development API": {
+        "description":"The RetryLife API's development deployment",
+        "check_code": {
+            "urls": ["https://beta.api.retrylife.ca"],
+            "status_code":200
+        }
+    },
+    "RetryLife API Global Infrastructure": {
+        "description":"The distributed backend infrastructure that hosts the RetryLife API",
+        "check_json_equal": {
+            "url": "https://www.vercel-status.com/api/v2/status.json",
+            "key":"status.description",
+            "value": "All Systems Operational"
+        }
+    },
+    "RetryLife API Backend Logging": {
+        "description":"The error logging service that keeps track of RetryLife API errors and events",
+        "check_json_equal": {
+            "url": "https://status.datadoghq.com/api/v2/status.json",
+            "key":"status.description",
+            "value": "All Systems Operational"
+        }
+    },
+    "RetryLife API Crash Tracking": {
+        "description":"The crash tracker for the RetryLife API, and some of Evan's apps",
+        "check_json_equal": {
+            "url": "https://status.sentry.io/api/v2/status.json",
+            "key":"status.description",
+            "value": "All Systems Operational"
+        }
+    },
+    "RetryLife Services Backend": {
+        "description":"The docker swarm master and main compute host powering the backend of most RetryLife services",
+        "check_code": {
+            "urls": ["https://admin.rtlroute.cc"],
+            "status_code":200
+        }
+    },
+    "RetryLife DNS Frontend": {
+        "description":"The admin panel for RetryLife DNS",
+        "check_code": {
+            "urls": ["http://s2.retrylife.ca/admin/"],
+            "status_code":200
+        }
+    },
+    "RetryLife DNS Backend": {
+        "description":"The RetryLife DNS server",
+        "check_json_equal": {
+            "url": "http://s2.retrylife.ca/admin/api.php",
+            "key": "FTLnotrunning",
+            "value": "false"
+        }
+    },
+    "remains.xyz": {
+        "description":"The remains.xyz gameservers",
+        "check_code": {
+            "urls": ["https://remains.xyz"],
+            "status_code":200
+        }
+    },
+    "cs.5024.ca": {
+        "description":"The Raider Robotics software development team's primary web server",
+        "check_code": {
+            "urls": ["https://cs.5024.ca"],
+            "status_code":200
+        }
+    },
+    "frc5024.github.io":{
+        "description":"The Raider Robotics software development team's fallback web server",
+        "check_code": {
+            "urls": ["https://frc5024.github.io"],
+            "status_code":200
+        }
+    },
+    "5024 Webdocs": {
+        "description":"The Raider Robotics software development team's documentation website",
+        "check_code": {
+            "urls": ["https://cs.5024.ca/webdocs", "https://frc5024.github.io/webdocs"],
+            "status_code":200
+        }
+    },
+    "Snapcode Backend": {
+        "description":"The Snapchat deeplink server that handles snapcode generation",
+        "check_code": {
+            "urls": ["https://app.snapchat.com/web/deeplink/snapcode?username=testuser&type=PNG"],
+            "status_code":200
+        }
+    },
+    "TheBlueAlliance Backend": {
+        "description":"TheBlueAlliance's backend server",
+        "check_code": {
+            "urls": ["https://www.thebluealliance.com/api/v3/status"],
+            "status_code":401
+        }
+    },
+    "FRC Field Management Database": {
+        "description":"The primary API server for connecting to FRC game databases",
+        "check_json_equal": {
+            "url": "https://frc-api.firstinspires.org/v2.0/",
+            "key":"status",
+            "value": "normal"
+        }
+    },
+}
 
 ### Crash Tracking & Analytics ###
 
@@ -479,6 +602,141 @@ def deviantartContent(user):
             "data":data
         }
     ), 200
+
+# Snapchat
+
+@app.route("/snapchat/<user>/snapcode.png")
+def getPNGSnapCode(user):
+
+    # Get the browser fingerprint
+    fingerprint = getBrowserFingerprint()
+
+    # Track this request
+    trackAPICall(
+        f"/snapchat/{user}/snapcode.png",
+        uid=fingerprint
+    )
+
+    # Make remote API call
+    image = requests.get(f"https://app.snapchat.com/web/deeplink/snapcode?username={user}&type=PNG&size=240", stream = True)
+    image.raw.decode_content = True
+
+    response = flask.make_response(image.raw.data)
+    response.headers.set('Content-Type', 'image/png')
+
+    return response
+
+@app.route("/snapchat/<user>/snapcode.svg")
+def getSVGSnapCode(user):
+
+    # Get the browser fingerprint
+    fingerprint = getBrowserFingerprint()
+
+    # Track this request
+    trackAPICall(
+        f"/snapchat/{user}/snapcode.svg",
+        uid=fingerprint
+    )
+
+    # Make remote API call
+    image = requests.get(f"https://app.snapchat.com/web/deeplink/snapcode?username={user}&type=SVG&size=240", stream = True)
+    image.raw.decode_content = True
+
+    response = flask.make_response(image.raw.data)
+    response.headers.set('Content-Type', 'image/svg')
+
+    return response
+
+# Status
+
+@app.route("/status")
+def getStatus():
+
+    # Get the browser fingerprint
+    fingerprint = getBrowserFingerprint()
+
+    # Track this request
+    trackAPICall(
+        f"/status",
+        uid=fingerprint
+    )
+
+    # Possable messages
+    STATUS_OK = "Operational"
+    STATUS_FAIL = "Degraded or Down"
+
+    # Build an output dict
+    output = {}
+
+    # Interate through every endpoint to check
+    for endpoint in statuspage_endpoints:
+
+        # Default to failure if no type
+        output[endpoint] = {
+            "ok":False,
+            "message": STATUS_FAIL,
+            "service_info": statuspage_endpoints[endpoint]["description"]
+        }
+
+        # Handle check type
+        if "check_code" in statuspage_endpoints[endpoint]:
+
+            # Get check data
+            urls = statuspage_endpoints[endpoint]["check_code"]["urls"]
+            code = statuspage_endpoints[endpoint]["check_code"]["status_code"]
+
+            # Check every URL
+            for url in urls:
+                if requests.get(url).status_code == code:
+                    output[endpoint]["ok"] = True
+                    output[endpoint]["message"] = STATUS_OK
+                    break
+            else:
+                output[endpoint]["ok"] = False
+                output[endpoint]["message"] = STATUS_FAIL
+        elif "check_json_equal" in statuspage_endpoints[endpoint]:
+
+            # Get data
+            url = statuspage_endpoints[endpoint]["check_json_equal"]["url"]
+            key = statuspage_endpoints[endpoint]["check_json_equal"]["key"]
+            value = statuspage_endpoints[endpoint]["check_json_equal"]["value"]
+
+            # Get response from remote
+            data = requests.get(url)
+
+            # Try to get JSON data
+            try:
+                json = data.json()
+            except:
+                output[endpoint]["ok"] = False
+                output[endpoint]["message"] = STATUS_FAIL
+            
+            # Recurse to get the value
+            remote_data = json
+            for subkey in key.split("."):
+                remote_data = remote_data[subkey]
+
+            # Check equality
+            if str(remote_data) == str(value):
+                output[endpoint]["ok"] = True
+                output[endpoint]["message"] = STATUS_OK
+            else:
+                output[endpoint]["ok"] = False
+                output[endpoint]["message"] = STATUS_FAIL
+    
+    # Build a response
+    response = flask.make_response(flask.jsonify(
+        {
+            "success": True,
+            "services":output
+        }
+    ))
+
+    # Enable Vercel caching, since this endpoint takes so long to load
+    response.headers.set('Cache-Control', 's-maxage=1, stale-while-revalidate')
+
+    # Return the status info
+    return response
 
 # endroutes
 

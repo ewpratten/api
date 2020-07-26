@@ -344,3 +344,66 @@ paths:
                           type: string
                         url:
                           type: string
+  /snapchat/{user}/snapcode.png:
+    get:
+      summary: "Get the snapcode for a Snapchat account as a PNG"
+      tags:
+        - Snapchat
+      produces:
+      - "image/png"
+      parameters:
+        - name: "user"
+          in: "path"
+          description: "Snapchat username"
+          required: true
+          type: string
+      responses:
+        200:
+          description: "User snapcode"
+          schema:
+            type: file
+  /snapchat/{user}/snapcode.svg:
+    get:
+      summary: "Get the snapcode for a Snapchat account as an SVG"
+      tags:
+        - Snapchat
+      produces:
+      - "image/svg"
+      parameters:
+        - name: "user"
+          in: "path"
+          description: "Snapchat username"
+          required: true
+          type: string
+      responses:
+        200:
+          description: "User snapcode"
+          schema:
+            type: file
+  /status:
+    get:
+      summary: "Get the statuses of all RetryLife services, and related services"
+      produces:
+      - "application/json"
+      tags:
+        - RetryLife
+      responses:
+        200:
+          description: "Status info"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: true
+              services:
+                type: object
+                additionalProperties:
+                  type: object
+                  properties:
+                    ok:
+                      type: boolean
+                    message:
+                      type: string
+                    service_info:
+                      type: string
