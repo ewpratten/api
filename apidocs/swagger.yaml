@@ -290,4 +290,57 @@ paths:
                 type: string
               changelog:
                 type: string
-        
+  /deviantart/{user}/content:
+    get:
+      summary: "Get a list of posts from a DeviantArt user"
+      tags:
+        - DeviantArt
+      produces:
+      - "application/json"
+      parameters:
+        - name: "user"
+          in: "path"
+          description: "DeviantArt username"
+          required: true
+          type: string
+      responses:
+        200:
+          description: "DeviantArt user posts"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: true
+              data:
+                type: object
+                properties:
+                  metadata:
+                    type: object
+                    properties:
+                      username:
+                        type: string
+                  content:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        media: 
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              height:
+                                type: string
+                              width: 
+                                type: string
+                              medium:
+                                type: string
+                              url:
+                                type: string
+                        nsfw:
+                          type: boolean
+                        title:
+                          type: string
+                        url:
+                          type: string
