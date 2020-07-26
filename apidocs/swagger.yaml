@@ -380,3 +380,28 @@ paths:
           description: "User snapcode"
           schema:
             type: file
+  /status:
+    get:
+      summary: "Get the statuses of all RetryLife services, and related services"
+      produces:
+      - "application/json"
+      tags:
+        - RetryLife
+      responses:
+        200:
+          description: "Status info"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: true
+              services:
+                type: object
+                additionalProperties:
+                  type: object
+                  properties:
+                    ok:
+                      type: boolean
+                    message:
+                      type: string
