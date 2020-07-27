@@ -92,8 +92,8 @@ statuspage_endpoints = {
         "description":"The RetryLife DNS server",
         "check_json_equal": {
             "url": "http://s2.retrylife.ca/admin/api.php",
-            "key": "FTLnotrunning",
-            "value": "false"
+            "key": "status",
+            "value": "enabled"
         }
     },
     "remains.xyz": {
@@ -726,9 +726,14 @@ def getStatus():
                 output[endpoint]["message"] = STATUS_FAIL
             
             # Recurse to get the value
-            remote_data = json
-            for subkey in key.split("."):
-                remote_data = remote_data[subkey]
+            try:
+                remote_data = json
+                for subkey in key.split("."):
+                    remote_data = remote_data[subkey]
+            except KeyError as e:
+                output[endpoint]["ok"] = False
+                output[endpoint]["message"] = STATUS_FAIL
+                continue
 
             # Check equality
             if str(remote_data) == str(value):
