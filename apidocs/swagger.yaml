@@ -437,3 +437,44 @@ paths:
                       type: object
                       additionalProperties:
                         type: number
+  /frc/year:
+    get:
+      summary: "Get the max FRC season year"
+      produces:
+      - "application/json"
+      tags:
+        - FRC
+      responses:
+        200:
+          description: "FRC year"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: true
+              year:
+                type: integer
+                example: 2020
+  /frc/password:
+    get:
+      summary: "Get the latest FRC game manual password"
+      produces:
+      - "application/json"
+      tags:
+        - FRC
+      responses:
+        200:
+          description: "FRC game password"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: true
+              year:
+                type: integer
+                example: 2020
+              password:
+                type: string
+                

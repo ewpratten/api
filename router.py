@@ -92,8 +92,8 @@ statuspage_endpoints = {
         "description":"The RetryLife DNS server",
         "check_json_equal": {
             "url": "http://s2.retrylife.ca/admin/api.php",
-            "key": "FTLnotrunning",
-            "value": "false"
+            "key": "status",
+            "value": "enabled"
         }
     },
     "remains.xyz": {
@@ -726,9 +726,14 @@ def getStatus():
                 output[endpoint]["message"] = STATUS_FAIL
             
             # Recurse to get the value
-            remote_data = json
-            for subkey in key.split("."):
-                remote_data = remote_data[subkey]
+            try:
+                remote_data = json
+                for subkey in key.split("."):
+                    remote_data = remote_data[subkey]
+            except KeyError as e:
+                output[endpoint]["ok"] = False
+                output[endpoint]["message"] = STATUS_FAIL
+                continue
 
             # Check equality
             if str(remote_data) == str(value):
@@ -837,6 +842,72 @@ def rsNinjaActivity():
 
     # Return the status info
     return response
+
+## FRC Tools
+
+def getFRCSeasonData():
+    return requests.get("https://frc-api.firstinspires.org/v2.0/").json()
+
+def getCSASupportedYears():
+
+    # Get the supported years list
+    year_list = requests.get("https://raw.githubusercontent.com/JamieSinn/CSA-USB-Tool/master/Years.txt").text.split("\n")
+
+    # Create the output
+    output = []
+    for year in year_list:
+        if "FRC" in year:
+            output.append(year.strip("FRC"))
+
+    output.sort()
+    return output
+    
+
+@app.route("/frc/year")
+def getFRCYear():
+
+    # Get the browser fingerprint
+    fingerprint = getBrowserFingerprint()
+
+    # Track this request
+    trackAPICall(
+        f"/frc/year",
+        uid=fingerprint
+    )
+
+    # Make a request to FMS API to get the FRC year
+    season_data = getFRCSeasonData()
+
+    # Return the data
+    return flask.jsonify({
+        "success":True,
+        "year":season_data["currentSeason"]
+    })
+
+@app.route("/frc/password")
+def getFRCSeasonPassword():
+
+    # Get the browser fingerprint
+    fingerprint = getBrowserFingerprint()
+
+    # Track this request
+    trackAPICall(
+        f"/frc/year",
+        uid=fingerprint
+    )
+
+    # Get the latest CSA year
+    latest_year = getCSASupportedYears()[-1]
+
+    # Get the latest password file
+    password = requests.get(f"https://raw.githubusercontent.com/JamieSinn/CSA-USB-Tool/master/{latest_year}Password.txt").text.strip()
+
+    # Return the data
+    return flask.jsonify({
+        "success":True,
+        "year":int(latest_year),
+        "password": password
+    })
 
 # endroutes
 
