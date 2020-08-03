@@ -162,6 +162,7 @@ statuspage_endpoints = {
     },
 }
 
+
 ### Crash Tracking & Analytics ###
 
 # Fingerprinting
@@ -252,6 +253,13 @@ def trackError(url, error, uid=ga_generateRandomUID()):
 
 
 ######################################## API Routes #####################################################
+
+## Add headers to all requests
+@app.after_request
+def allRequests(response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "authorization"
+    return response
 
 ## Errors
 
