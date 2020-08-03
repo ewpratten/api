@@ -15,33 +15,24 @@
             "use": "@now/static"
         }
     ],
-    "headers": [
-        {
-            "source": "/(.*)",
-            "headers": [
-                {
-                    "key": "Access-Control-Allow-Origin",
-                    "value": "*"
-                },
-                {
-                    "key": "Access-Control-Allow-Headers",
-                    "value": "authorization"
-                },
-                {
-                    "key": "RetryLife-Service-Source",
-                    "value": "lambda"
-                }
-            ]
-        }
-    ],
     "routes": [
         {
             "src": "/.*",
-            "dest": "/router.py"
+            "dest": "/router.py",
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "authorization",
+                "RetryLife-Service-Source": "lambda"
+            }
         },
         {
             "src": "/",
-            "dest": "/router.py"
+            "dest": "/router.py",
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "authorization",
+                "RetryLife-Service-Source": "lambda"
+            }
         }
     ]
 }
