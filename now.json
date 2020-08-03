@@ -21,8 +21,9 @@
             "dest": "/router.py",
             "headers": {
                 "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Headers": "authorization",
-                "RetryLife-Service-Source": "lambda"
+                "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+                "RetryLife-Service-Source": "lambda",
+                "Access-Control-Allow-Credentials": "true"
             }
         },
         {
@@ -30,8 +31,9 @@
             "dest": "/router.py",
             "headers": {
                 "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Headers": "authorization",
-                "RetryLife-Service-Source": "lambda"
+                "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+                "RetryLife-Service-Source": "lambda",
+                "Access-Control-Allow-Credentials": "true"
             }
         }
     ]
