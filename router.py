@@ -257,8 +257,10 @@ def trackError(url, error, uid=ga_generateRandomUID()):
 ## Add headers to all requests
 @app.after_request
 def allRequests(response):
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Headers"] = "authorization"
+    if __name__ == "__main__":
+        print("Injecting localhost CORS headers")
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Headers"] = "authorization"
     return response
 
 ## Errors
