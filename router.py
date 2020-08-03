@@ -367,7 +367,7 @@ def auth():
     # Return the creds
     return flask.jsonify({
         "success": True,
-        "token":base64.b64encode(f"{creds.username}:{creds.password}".encode())
+        "token":base64.b64encode(f"{creds.username}:{creds.password}".encode()).decode()
     })
     
 @app.route("/tvdsb/student/attendance", methods=["GET"])
