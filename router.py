@@ -221,8 +221,12 @@ def ga_trackEvent(category, action, uid=ga_generateRandomUID()):
 
 
 def ga_mkGACollectionRequest(data: dict):
-    requests.post(
-        'https://www.google-analytics.com/collect', data=data)
+    try:
+        requests.post(
+            'https://www.google-analytics.com/collect', data=data)
+    except requests.exceptions.ConnectionError as e:
+        print("Failed to make tracking request")
+
 
 def trackAPICall(url, uid=ga_generateRandomUID()):
 
@@ -353,7 +357,7 @@ def auth():
     # Return the creds
     return flask.jsonify({
         "success": True,
-        "token":base64.b64encode(pickle.dumps(creds)).decode()
+        "token":base64.b64encode(f"{creds.username}:{creds.password}".encode())
     })
     
 @app.route("/tvdsb/student/attendance", methods=["GET"])
@@ -362,14 +366,24 @@ def attendance():
     # Get token
     token = flask.request.args.get("token", default="")
 
-    # Unpickle (and handle invalid token)
-    try:
-        creds = pickle.loads(base64.b64decode(token.encode()))
-    except EOFError as e:
+    if token:
+        # Unpickle (and handle invalid token)
+        try:
+            creds = pickle.loads(base64.b64decode(token.encode()))
+        except EOFError as e:
+            return flask.jsonify({
+                "success": False,
+                "message": "Invalid token format, or no token specified"
+            }), 401
+    
+    # Handle auth header
+    if flask.request.authorization:
+        creds = tvdsb_student.LoginCreds(flask.request.authorization.username, flask.request.authorization.password)
+    else:
         return flask.jsonify({
-            "success": False,
-            "message": "Invalid token format, or no token specified"
-        }),401
+                "success": False,
+                "message": "Authorization header not set"
+            }), 401
 
     # Get attendance
     try:
@@ -402,14 +416,24 @@ def marks():
     # Get token
     token = flask.request.args.get("token", default="")
 
-    # Unpickle (and handle invalid token)
-    try:
-        creds = pickle.loads(base64.b64decode(token.encode()))
-    except EOFError as e:
+    if token:
+        # Unpickle (and handle invalid token)
+        try:
+            creds = pickle.loads(base64.b64decode(token.encode()))
+        except EOFError as e:
+            return flask.jsonify({
+                "success": False,
+                "message": "Invalid token format, or no token specified"
+            }), 401
+    
+    # Handle auth header
+    if flask.request.authorization:
+        creds = tvdsb_student.LoginCreds(flask.request.authorization.username, flask.request.authorization.password)
+    else:
         return flask.jsonify({
-            "success": False,
-            "message": "Invalid token format, or no token specified"
-        }),401
+                "success": False,
+                "message": "Authorization header not set"
+            }), 401
 
     # Get marks
     try:
@@ -442,14 +466,24 @@ def payment():
     # Get token
     token = flask.request.args.get("token", default="")
 
-    # Unpickle (and handle invalid token)
-    try:
-        creds = pickle.loads(base64.b64decode(token.encode()))
-    except EOFError as e:
+    if token:
+        # Unpickle (and handle invalid token)
+        try:
+            creds = pickle.loads(base64.b64decode(token.encode()))
+        except EOFError as e:
+            return flask.jsonify({
+                "success": False,
+                "message": "Invalid token format, or no token specified"
+            }), 401
+    
+    # Handle auth header
+    if flask.request.authorization:
+        creds = tvdsb_student.LoginCreds(flask.request.authorization.username, flask.request.authorization.password)
+    else:
         return flask.jsonify({
-            "success": False,
-            "message": "Invalid token format, or no token specified"
-        }),401
+                "success": False,
+                "message": "Authorization header not set"
+            }), 401
 
     # Get payment
     try:
@@ -482,14 +516,24 @@ def timetable():
     # Get token
     token = flask.request.args.get("token", default="")
 
-    # Unpickle (and handle invalid token)
-    try:
-        creds = pickle.loads(base64.b64decode(token.encode()))
-    except EOFError as e:
+    if token:
+        # Unpickle (and handle invalid token)
+        try:
+            creds = pickle.loads(base64.b64decode(token.encode()))
+        except EOFError as e:
+            return flask.jsonify({
+                "success": False,
+                "message": "Invalid token format, or no token specified"
+            }), 401
+    
+    # Handle auth header
+    if flask.request.authorization:
+        creds = tvdsb_student.LoginCreds(flask.request.authorization.username, flask.request.authorization.password)
+    else:
         return flask.jsonify({
-            "success": False,
-            "message": "Invalid token format, or no token specified"
-        }),401
+                "success": False,
+                "message": "Authorization header not set"
+            }), 401
 
     # Get timetable
     try:
