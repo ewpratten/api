@@ -77,7 +77,10 @@ statuspage_endpoints = {
     "RetryLife Services Backend": {
         "description":"The docker swarm master and main compute host powering the backend of most RetryLife services",
         "check_code": {
-            "urls": ["https://admin.rtlroute.cc"],
+            "urls": [
+                "http://thisdoesnotexist.retrylife.ca"
+                # "https://admin.rtlroute.cc"
+                ],
             "status_code":200
         }
     },
@@ -99,7 +102,10 @@ statuspage_endpoints = {
     "remains.xyz": {
         "description":"The remains.xyz gameservers",
         "check_code": {
-            "urls": ["https://remains.xyz"],
+            "urls": [
+                "http://thisdoesnotexist.retrylife.ca"
+                # "https://remains.xyz"
+                ],
             "status_code":200
         }
     },
@@ -113,7 +119,10 @@ statuspage_endpoints = {
     "RetryLife Maven": {
         "description":"The RetryLife maven server",
         "check_code": {
-            "urls": ["https://mvn.retrylife.ca/"],
+            "urls": [
+                "http://thisdoesnotexist.retrylife.ca"
+                # "https://mvn.retrylife.ca/"
+            ],
             "status_code":200
         }
     },
@@ -356,7 +365,19 @@ def auth():
         return flask.jsonify({
             "success": False,
             "message": "Invalid auth"
-        }),401
+        }), 401
+    except IndexError as e:
+        trackError(
+            "/tvdsb/student/auth",
+            "FailedToParse",
+            uid=creds.username
+        )
+        sentry_sdk.capture_exception(e)
+        return flask.jsonify({
+            "success": False,
+            "message": "TVDSB API responded with an unsupported response"
+        }), 500
+
 
     # Log a success
     trackAPICall(
@@ -407,7 +428,18 @@ def attendance():
         return flask.jsonify({
             "success": False,
             "message": "Invalid auth"
-        }),401
+        }), 401
+    except IndexError as e:
+        trackError(
+            "/tvdsb/student/attendance",
+            "FailedToParse",
+            uid=creds.username
+        )
+        sentry_sdk.capture_exception(e)
+        return flask.jsonify({
+            "success": False,
+            "message": "TVDSB API responded with an unsupported response"
+        }), 500
 
     # Log a success
     trackAPICall(
@@ -457,7 +489,18 @@ def marks():
         return flask.jsonify({
             "success": False,
             "message": "Invalid auth"
-        }),401
+        }), 401
+    except IndexError as e:
+        trackError(
+            "/tvdsb/student/marks",
+            "FailedToParse",
+            uid=creds.username
+        )
+        sentry_sdk.capture_exception(e)
+        return flask.jsonify({
+            "success": False,
+            "message": "TVDSB API responded with an unsupported response"
+        }), 500
 
     # Log a success
     trackAPICall(
@@ -507,7 +550,18 @@ def payment():
         return flask.jsonify({
             "success": False,
             "message": "Invalid auth"
-        }),401
+        }), 401
+    except IndexError as e:
+        trackError(
+            "/tvdsb/student/payment",
+            "FailedToParse",
+            uid=creds.username
+        )
+        sentry_sdk.capture_exception(e)
+        return flask.jsonify({
+            "success": False,
+            "message": "TVDSB API responded with an unsupported response"
+        }), 500
 
     # Log a success
     trackAPICall(
@@ -557,7 +611,18 @@ def timetable():
         return flask.jsonify({
             "success": False,
             "message": "Invalid auth"
-        }),401
+        }), 401
+    except IndexError as e:
+        trackError(
+            "/tvdsb/student/timetable",
+            "FailedToParse",
+            uid=creds.username
+        )
+        sentry_sdk.capture_exception(e)
+        return flask.jsonify({
+            "success": False,
+            "message": "TVDSB API responded with an unsupported response"
+        }), 500
 
     # Log a success
     trackAPICall(
@@ -739,64 +804,72 @@ def getStatus():
     # Interate through every endpoint to check
     for endpoint in statuspage_endpoints:
 
-        # Default to failure if no type
-        output[endpoint] = {
-            "ok":False,
-            "message": STATUS_FAIL,
-            "service_info": statuspage_endpoints[endpoint]["description"]
-        }
+        try:
+            # Default to failure if no type
+            output[endpoint] = {
+                "ok":False,
+                "message": STATUS_FAIL,
+                "service_info": statuspage_endpoints[endpoint]["description"]
+            }
 
-        # Handle check type
-        if "check_code" in statuspage_endpoints[endpoint]:
+            # Handle check type
+            if "check_code" in statuspage_endpoints[endpoint]:
 
-            # Get check data
-            urls = statuspage_endpoints[endpoint]["check_code"]["urls"]
-            code = statuspage_endpoints[endpoint]["check_code"]["status_code"]
+                # Get check data
+                urls = statuspage_endpoints[endpoint]["check_code"]["urls"]
+                code = statuspage_endpoints[endpoint]["check_code"]["status_code"]
 
-            # Check every URL
-            for url in urls:
-                if requests.get(url).status_code == code:
+                # Check every URL
+                for url in urls:
+                    if requests.get(url).status_code == code:
+                        output[endpoint]["ok"] = True
+                        output[endpoint]["message"] = STATUS_OK
+                        break
+                else:
+                    output[endpoint]["ok"] = False
+                    output[endpoint]["message"] = STATUS_FAIL
+            elif "check_json_equal" in statuspage_endpoints[endpoint]:
+
+                # Get data
+                url = statuspage_endpoints[endpoint]["check_json_equal"]["url"]
+                key = statuspage_endpoints[endpoint]["check_json_equal"]["key"]
+                value = statuspage_endpoints[endpoint]["check_json_equal"]["value"]
+
+                # Get response from remote
+                data = requests.get(url)
+
+                # Try to get JSON data
+                try:
+                    json = data.json()
+                except:
+                    output[endpoint]["ok"] = False
+                    output[endpoint]["message"] = STATUS_FAIL
+                
+                # Recurse to get the value
+                try:
+                    remote_data = json
+                    for subkey in key.split("."):
+                        remote_data = remote_data[subkey]
+                except KeyError as e:
+                    output[endpoint]["ok"] = False
+                    output[endpoint]["message"] = STATUS_FAIL
+                    continue
+
+                # Check equality
+                if str(remote_data) == str(value):
                     output[endpoint]["ok"] = True
                     output[endpoint]["message"] = STATUS_OK
-                    break
-            else:
-                output[endpoint]["ok"] = False
-                output[endpoint]["message"] = STATUS_FAIL
-        elif "check_json_equal" in statuspage_endpoints[endpoint]:
+                else:
+                    output[endpoint]["ok"] = False
+                    output[endpoint]["message"] = STATUS_FAIL
+        except requests.exceptions.ConnectionError as e:
+            trackError(
+                "/status",
+                "FailedToResolve."+base64.b64encode("endpoint".encode()).decode(),
+                uid=fingerprint
+            )
+            sentry_sdk.capture_exception(e)
 
-            # Get data
-            url = statuspage_endpoints[endpoint]["check_json_equal"]["url"]
-            key = statuspage_endpoints[endpoint]["check_json_equal"]["key"]
-            value = statuspage_endpoints[endpoint]["check_json_equal"]["value"]
-
-            # Get response from remote
-            data = requests.get(url)
-
-            # Try to get JSON data
-            try:
-                json = data.json()
-            except:
-                output[endpoint]["ok"] = False
-                output[endpoint]["message"] = STATUS_FAIL
-            
-            # Recurse to get the value
-            try:
-                remote_data = json
-                for subkey in key.split("."):
-                    remote_data = remote_data[subkey]
-            except KeyError as e:
-                output[endpoint]["ok"] = False
-                output[endpoint]["message"] = STATUS_FAIL
-                continue
-
-            # Check equality
-            if str(remote_data) == str(value):
-                output[endpoint]["ok"] = True
-                output[endpoint]["message"] = STATUS_OK
-            else:
-                output[endpoint]["ok"] = False
-                output[endpoint]["message"] = STATUS_FAIL
-    
     # Build a response
     response = flask.make_response(flask.jsonify(
         {
