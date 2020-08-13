@@ -373,11 +373,6 @@ def auth():
             uid=creds.username
         )
         sentry_sdk.capture_exception(e)
-        return flask.jsonify({
-            "success": False,
-            "message": "TVDSB API responded with an unsupported response"
-        }), 500
-
 
     # Log a success
     trackAPICall(
