@@ -477,4 +477,29 @@ paths:
                 example: 2020
               password:
                 type: string
-                
+  /minecraft/server/{domain}:
+    get:
+      summary: "Get any avalible info about a minecraft server"
+      parameters:
+        - name: "domain"
+          in: "path"
+          description: "Domain (and optionally port) of a minecraft server"
+          required: true
+          type: string
+      produces:
+      - "application/json"
+      tags:
+        - Minecraft
+      responses:
+        200:
+          description: "Raw server response data"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: true
+              status:
+                type: object
+              query:
+                type: object
