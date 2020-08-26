@@ -544,3 +544,64 @@ paths:
                 type: array
                 items:
                   type: object
+  /radio/dx/activity:
+    get:
+      summary: "Get the 50 most recent CW DX messages recorded around the world"
+      produces:
+      - "application/json"
+      tags:
+        - Amatuer Radio
+      responses:
+        200:
+          description: "List of messages"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: true
+              messages:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                    frequency:
+                      type: number
+                    timestamp:
+                      type: string
+                    from:
+                      type: object
+                      properties:
+                        callsign: 
+                          type: string
+                        country:
+                          type: string
+                        continent:
+                          type: string
+                        iso_3166:
+                          type: string
+                        itu_zone:
+                          type: string
+                        cq_zone:
+                          type: string
+                        region:
+                          type: string
+                    to:
+                      type: object
+                      properties:
+                        callsign: 
+                          type: string
+                        country:
+                          type: string
+                        continent:
+                          type: string
+                        iso_3166:
+                          type: string
+                        itu_zone:
+                          type: string
+                        cq_zone:
+                          type: string
+                        region:
+                          type: string
