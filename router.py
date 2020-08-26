@@ -171,7 +171,7 @@ statuspage_endpoints = {
             "key":"status",
             "value": "normal"
         }
-    },
+    }
 }
 
 
@@ -1052,7 +1052,23 @@ def getMinecraftServerInfo(domain):
     server = MinecraftServer.lookup(domain)
 
     # Get data
-    status = server.status().raw
+    try:
+        status = server.status().raw
+    except socket.gaierror:
+        response = flask.make_response(flask.jsonify({
+            "success": False,
+            "message":"Server not found"
+        }))
+        response.headers.set('Cache-Control', 's-maxage=1, stale-while-revalidate')
+        return response
+        
+    except OSError:
+        response = flask.make_response(flask.jsonify({
+            "success": False,
+            "message":"Minecraft not running at this address"
+        }))
+        response.headers.set('Cache-Control', 's-maxage=1, stale-while-revalidate')
+        return response
 
     try:
         query = server.query().raw
@@ -1082,6 +1098,14 @@ def getMinecraftUser(user):
 
     # Get data
     userprofile = requests.get(f"https://api.mojang.com/users/profiles/minecraft/{user}").json()
+
+    # Do a quick check to make sure the user exists
+    if "id" not in userprofile:
+        return flask.make_response(flask.jsonify({
+            "success": False,
+            "message":"User not found"
+        }))
+
     history = requests.get(f"https://api.mojang.com/user/profiles/" + userprofile["id"] + "/names").json()
     useraccount = requests.post("https://api.mojang.com/profiles/minecraft", data=user).json()
     skin = requests.get(f"https://sessionserver.mojang.com/session/minecraft/profile/" + userprofile["id"]).json()
