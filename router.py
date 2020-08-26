@@ -1061,7 +1061,7 @@ def getMinecraftServerInfo(domain):
         }))
         response.headers.set('Cache-Control', 's-maxage=1, stale-while-revalidate')
         return response
-        
+
     except OSError:
         response = flask.make_response(flask.jsonify({
             "success": False,
@@ -1135,6 +1135,97 @@ def getMinecraftUser(user):
     response.headers.set('Cache-Control', 's-maxage=1, stale-while-revalidate')
 
     return response
+
+## DXWatch
+
+@app.route("/radio/dx/activity")
+def getDXActivity():
+
+    # Get the browser fingerprint
+    fingerprint = getBrowserFingerprint()
+
+    # Track this request
+    trackAPICall(
+        f"/radio/dx/activity",
+        uid=fingerprint
+    )
+
+    # Fetch current data from dxwatch backend
+    data = requests.get("https://dxwatch.com/dxsd1/s.php?s=0&r=50&d=1&fid=0").json()
+
+    # Build a list of all recent messages
+    messages = []
+
+    # Parse each event
+    for event_key in data["s"].keys():
+
+        # Get event
+        event = data["s"][event_key]
+
+        # Build base message
+        msg = {
+            "message":event[3],
+            "frequency": event[1],
+            "timestamp": event[4]
+        }
+
+        # Get dx and de callsigns
+        de = event[0]
+        dx = event[2]
+
+        # Get full data about the people involved
+        if de in data["ci"].keys():
+            msg["from"] = {
+                "callsign": de,
+                "country": data["ci"][de][1],
+                "continent": data["ci"][de][2] if data["ci"][de][2] != "NA" else None,
+                "iso_3166": data["ci"][de][3].upper(),
+                "itu_zone":data["ci"][de][4],
+                "cq_zone": data["ci"][de][5],
+                "region": data["ci"][de][8] if data["ci"][de][8] else None
+                
+            }
+        else:
+            msg["from"] = {
+                "callsign": de,
+                "country": None,
+                "continent": None,
+                "iso_3166": None,
+                "itu_zone":None,
+                "cq_zone": None,
+                "region": None
+            }
+        if dx in data["ci"].keys():
+            msg["to"] = {
+                "callsign": dx,
+                "country": data["ci"][dx][1],
+                "continent": data["ci"][dx][2] if data["ci"][dx][2] != "NA" else None,
+                "iso_3166": data["ci"][dx][3].upper(),
+                "itu_zone":data["ci"][dx][4],
+                "cq_zone": data["ci"][dx][5],
+                "region": data["ci"][dx][8] if data["ci"][dx][8] else None
+                
+            }
+        else:
+            msg["to"] = {
+                "callsign": dx,
+                "country": None,
+                "continent": None,
+                "iso_3166": None,
+                "itu_zone":None,
+                "cq_zone": None,
+                "region": None
+            }
+
+
+        # Build message data
+        messages.append(msg)
+
+    # Build response
+    return flask.jsonify({
+        "success": "True",
+        "messages":messages
+    })
 
 # endroutes
 
