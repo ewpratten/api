@@ -3,3 +3,4 @@ requests
 tvdsb-student-api>=1.7
 sentry-sdk[flask]==0.16.1
 feedparser
+mcstatus

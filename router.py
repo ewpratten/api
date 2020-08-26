@@ -17,6 +17,8 @@ import flask
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 import feedparser
+from mcstatus import MinecraftServer
+import socket
 
 # Set up flask
 sentry_sdk.init(
@@ -1030,6 +1032,41 @@ def getFRCSeasonPassword():
         "year":int(latest_year),
         "password": password
     })
+
+## Minecraft
+
+@app.route("/minecraft/server/<domain>")
+def getMinecraftServerInfo(domain):
+
+    # Get the browser fingerprint
+    fingerprint = getBrowserFingerprint()
+
+    # Track this request
+    trackAPICall(
+        f"/minecraft/server/{domain}",
+        uid=fingerprint
+    )
+
+    # Get the server
+    server = MinecraftServer.lookup(domain)
+
+    # Get data
+    status = server.status().raw
+
+    try:
+        query = server.query().raw
+    except socket.timeout:
+        query = None
+
+    response = flask.make_response(flask.jsonify({
+        "success": True,
+        "status":status,
+        "query":query
+    }))
+
+    response.headers.set('Cache-Control', 's-maxage=1, stale-while-revalidate')
+
+    return response
 
 # endroutes
 
