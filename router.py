@@ -19,6 +19,7 @@ from sentry_sdk.integrations.flask import FlaskIntegration
 import feedparser
 from mcstatus import MinecraftServer
 import socket
+import json
 
 # Set up flask
 sentry_sdk.init(
@@ -1063,6 +1064,49 @@ def getMinecraftServerInfo(domain):
         "status":status,
         "query":query
     }))
+
+    response.headers.set('Cache-Control', 's-maxage=1, stale-while-revalidate')
+
+    return response
+
+@app.route("/minecraft/user/<user>")
+def getMinecraftUser(user):
+    # Get the browser fingerprint
+    fingerprint = getBrowserFingerprint()
+
+    # Track this request
+    trackAPICall(
+        f"/minecraft/user/{user}",
+        uid=fingerprint
+    )
+
+    # Get data
+    userprofile = requests.get(f"https://api.mojang.com/users/profiles/minecraft/{user}").json()
+    history = requests.get(f"https://api.mojang.com/user/profiles/" + userprofile["id"] + "/names").json()
+    useraccount = requests.post("https://api.mojang.com/profiles/minecraft", data=user).json()
+    skin = requests.get(f"https://sessionserver.mojang.com/session/minecraft/profile/" + userprofile["id"]).json()
+
+    # Parse out everything needed
+    data = {
+        "success": True,
+        "username": userprofile["name"],
+        "uid": userprofile["id"],
+        "premium": not useraccount.get("dmeo", False),
+        "legacy": useraccount.get("legacy", False),
+        "name_history": history,
+    }
+
+    if "error" not in skin:
+        texture_info = []
+        for prop in skin["properties"]:
+            if prop["name"] == "textures":
+                texture_info.append(json.loads(base64.b64decode(prop["value"])))
+        data["skin"] = texture_info
+    else:
+        data["skin"] = None
+    
+
+    response = flask.make_response(flask.jsonify(data))
 
     response.headers.set('Cache-Control', 's-maxage=1, stale-while-revalidate')
 

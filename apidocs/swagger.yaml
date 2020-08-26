@@ -503,3 +503,44 @@ paths:
                 type: object
               query:
                 type: object
+  /minecraft/user/{user}:
+    get:
+      summary: "Get any avalible info about a minecraft user"
+      parameters:
+        - name: "user"
+          in: "path"
+          description: "User's current username"
+          required: true
+          type: string
+      produces:
+      - "application/json"
+      tags:
+        - Minecraft
+      responses:
+        200:
+          description: "Raw server response data"
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: true
+              username:
+                type: string
+              uid:
+                type: string
+              premium:
+                type: boolean
+              legacy:
+                type: boolean
+              name_history:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name: 
+                      type: string
+              skin:
+                type: array
+                items:
+                  type: object
