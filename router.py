@@ -1227,6 +1227,29 @@ def getDXActivity():
         "messages":messages
     })
 
+## Xkcd
+
+@app.route("/xkcd/mobile/rss.xml")
+def getXKCDMobileRSS():
+
+    # Get the browser fingerprint
+    fingerprint = getBrowserFingerprint()
+
+    # Track this request
+    trackAPICall(
+        f"/xkcd/mobile/rss.xml",
+        uid=fingerprint
+    )
+    
+    # Fetch the XKCD RSS feed
+    rss = requests.get("https://xkcd.com/rss.xml").text
+
+    # Replace all domains with mobile domain
+    mobile_rss = rss.replace("://xkcd.com", "://m.xkcd.com")
+
+    # Return the data
+    return flask.Response(mobile_rss, mimetype='text/xml')
+
 # endroutes
 
 # Create a little runner for starting Flask locally
