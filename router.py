@@ -20,6 +20,11 @@ import feedparser
 from mcstatus import MinecraftServer
 import socket
 import json
+from feedgen.feed import FeedGenerator
+import re
+import markdown2
+from datetime import datetime
+import pytz
 
 # Set up flask
 sentry_sdk.init(
@@ -967,6 +972,65 @@ def rsNinjaActivity():
 
     # Return the status info
     return response
+
+@app.route("/rsninja722/blog/rss.xml")
+def getJamesRSS():
+
+    # Get the browser fingerprint
+    fingerprint = getBrowserFingerprint()
+
+    # Track this request
+    trackAPICall(
+        f"/rsninja722/blog/rss.xml",
+        uid=fingerprint
+    )
+
+    # Build an rss feed
+    rss = FeedGenerator()
+    rss.title("rsninja Blog")
+    rss.author(
+        {
+            "name":"James Nickoli"
+        }
+    )
+    rss.link(href='https://rsninja.dev/blog')
+    rss.language('en')
+    rss.description("James Nickoli's personal blog")
+
+    # Fetch posts list
+    posts_js = requests.get("https://rsninja.dev/blog/posts/postList.js").text.strip().replace("\n", "").replace("\r", "").replace("\t", "").replace("    ", "").replace(";", "").strip()
+    print(re.findall(r".*posts = (.*)", posts_js, re.M)[0])
+
+    # Convert JS to Python
+    posts = json.loads(re.findall(r".*posts = (.*)", posts_js, re.M)[0])
+
+    # Add each post to the feed
+    for post in posts:
+        fe = rss.add_entry()
+        fe.id(f"https://rsninja.dev/blog/?post={post[0]}")
+        fe.title(post[0].replace("_", " "))
+        fe.link(href=f"https://rsninja.dev/blog/?post={post[0]}")
+        
+        # Fetch post from his server
+        post_md = requests.get(f"https://rsninja.dev/blog/posts/{post[0]}.md").text
+
+        # Render to HTML
+        post_content = markdown2.markdown(post_md)
+        
+        # Set content
+        fe.content(post_content)
+
+        # Set publish
+        fe.published(datetime.strptime(post[1], "%Y.%m.%d").replace(tzinfo=pytz.timezone("America/Toronto")))
+
+
+    # Build a response
+    res = flask.make_response(rss.rss_str(pretty=True))
+    res.headers.set("content-type", "application/xml")
+    res.headers.set('Cache-Control', 's-maxage=120, stale-while-revalidate')
+
+    return res
+    
 
 ## FRC Tools
 
