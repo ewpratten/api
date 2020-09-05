@@ -23,6 +23,8 @@ import json
 from feedgen.feed import FeedGenerator
 import re
 import markdown2
+from datetime import datetime
+import pytz
 
 # Set up flask
 sentry_sdk.init(
@@ -1017,6 +1019,9 @@ def getJamesRSS():
         
         # Set content
         fe.content(post_content)
+
+        # Set publish
+        fe.published(datetime.strptime(post[1], "%Y.%m.%d").replace(tzinfo=pytz.timezone("America/Toronto")))
 
 
     # Build a response
