@@ -1286,10 +1286,12 @@ def getDXActivity():
         messages.append(msg)
 
     # Build response
-    return flask.jsonify({
+    response = flask.jsonify({
         "success": "True",
         "messages":messages
     })
+    response.headers.set('Cache-Control', 's-maxage=2, stale-while-revalidate')
+    return response
 
 ## Xkcd
 
